@@ -1,7 +1,9 @@
 version: '3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    # image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    build:
+      context: .
     container_name: es
     environment:
       - cluster.name=es-cluster
@@ -39,7 +41,13 @@ services:
     networks:
       esnet:
         aliases:
-          - 'es'    
+          - 'es'
+    # command:
+    #   - sh
+    #   - -c
+    #   - "./bin/elasticsearch-plugin list | grep -q analysis-icu || ./bin/elasticsearch-plugin install analysis-icu;"
+    # entrypoint:
+    #    ["/docker-entrypoint.sh"]
 
   cerebro:
     image: lmenezes/cerebro:0.8.1
@@ -64,6 +72,8 @@ services:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redisdata:/data
     entrypoint: redis-server --appendonly yes
+    # alternative to entrypoint:
+    # command: ["redis-server", "--appendonly", "yes"]
 
 volumes:
   esdata:
