@@ -1,7 +1,6 @@
 version: '3'
 services:
   elasticsearch:
-    # image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
     build:
       context: .
     container_name: es
@@ -9,7 +8,7 @@ services:
       - cluster.name=es-cluster
       - node.name=master
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx2g"
       # disabling xpack since we don't use it and it installed by default in this image
       # ES v6 contains -OSS alternatives that don't contain xpack
       - xpack.security.enabled=false
@@ -42,12 +41,6 @@ services:
       esnet:
         aliases:
           - 'es'
-    # command:
-    #   - sh
-    #   - -c
-    #   - "./bin/elasticsearch-plugin list | grep -q analysis-icu || ./bin/elasticsearch-plugin install analysis-icu;"
-    # entrypoint:
-    #    ["/docker-entrypoint.sh"]
 
   cerebro:
     image: lmenezes/cerebro:0.8.1
@@ -62,6 +55,11 @@ services:
   redis: 
     image: redis:5.0.1-alpine
     container_name: redis
+
+    # running in privileged mode is for resolving the Redis warning: 
+    # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel.
+    privileged: true
+
     ports:
       - 6379:6379
     networks:
@@ -71,13 +69,38 @@ services:
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redisdata:/data
-    entrypoint: redis-server --appendonly yes
-    # alternative to entrypoint:
-    # command: ["redis-server", "--appendonly", "yes"]
+    # entrypoint: redis-server --appendonly yes
+    # alternative to entrypoint and including additional configuration commands:
+    command: >
+      sh -c " echo never > /sys/kernel/mm/transparent_hugepage/enabled &&
+              sysctl -w net.core.somaxconn=1024 &&
+              redis-server --appendonly yes"
+
+  prizm:
+    build:
+      context: prizm/ubuntu16.04
+    image: prizm:ubuntu16.04
+    container_name: prizm
+    ports:
+      - 3000:3000
+      - 8080:8080
+      - 18001:18001
+      - 18681:18681    
+      - 18682:18682
+    networks:
+      esnet:
+        aliases:
+          - 'prizm'
+    volumes:
+      - prizmlogs:/dev/logs
+    tty: true
+    stdin_open: true
+    container_name: prizm
 
 volumes:
   esdata:
   redisdata:
+  prizmlogs:
 
 networks:
    esnet:

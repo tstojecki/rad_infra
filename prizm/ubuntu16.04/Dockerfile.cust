@@ -1,0 +1,32 @@
+FROM ubuntu:16.04
+
+# this is a start on a fully custom install of Prizm Server and Client. However, switched away am using
+# Brian Jenkins repo as starting-point for a prizm server and client image instead.
+# ref. locale config: https://www.thomas-krenn.com/en/wiki/Configure_Locales_in_Ubuntu#No_locale_set
+RUN apt-get update \
+&& apt-get install locales -y \
+&& locale-gen en_US.UTF-8 \
+&& apt-get install wget -y \
+&& wget http://products.accusoft.com/PrizmDoc/13.4/prizmdoc_server_13.4.amd64.deb.tar.gz -q \
+&& wget http://products.accusoft.com/PrizmDoc/13.4/prizmdoc_client_13.4.amd64.deb.tar.gz -q \
+&& tar -xzvf prizmdoc_client_*.deb.tar.gz \
+&& cd prizmdoc_client_*.deb \
+&& dpkg -i *.deb \
+&& apt-get -f install \
+&& cd .. \
+&& tar -xzvf prizmdoc_server_*.deb.tar.gz \
+&& cd prizmdoc_server_*.deb \
+&& dpkg -i *.deb \
+&& apt-get -f install \
+&& cd .. \
+&& apt-get install fontconfig -y \
+&& ln -s /usr/share/prizm/scripts/pccis.sh /etc/init.d/pccis \
+&& update-rc.d pccis defaults
+
+# these do not work in v13 of the installation. Will try on v13.4. The file and path do not exist
+# on which the symbolic link is based, do not exist.
+# && ln -s /usr/share/prizm/modules/poppler/fonts/accusoft_prizm_fonts.conf /etc/fonts/conf.d/99-accusoft_prizm_fonts.conf \
+# && fc-cache -f \
+# this should come right after fontconfig...
+
+ENTRYPOINT bash
