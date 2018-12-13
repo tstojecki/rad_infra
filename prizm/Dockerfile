@@ -51,6 +51,7 @@ RUN apt-get update \
 
 ENV DEBIAN_FRONTEND teletype
 
+
 # v12 and v13 entrypoint:
 # ENTRYPOINT /usr/share/prizm/java/jre8/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
 # 		&& /usr/share/prizm/scripts/pccis.sh start
