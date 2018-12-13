@@ -78,9 +78,9 @@ services:
 
   prizm:
     build:
-      context: prizm/ubuntu16.04
-    image: prizm:ubuntu16.04
-    container_name: prizm
+      context: prizm/
+    image: prizm:11.2
+    container_name: prizmdoc
     ports:
       - 3000:3000
       - 8080:8080
