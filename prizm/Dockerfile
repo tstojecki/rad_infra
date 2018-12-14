@@ -51,7 +51,10 @@ RUN apt-get update \
 
 ENV DEBIAN_FRONTEND teletype
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b6a61d8... organized image build for different versions
 # v12 and v13 entrypoint:
 # ENTRYPOINT /usr/share/prizm/java/jre8/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
 # 		&& /usr/share/prizm/scripts/pccis.sh start
