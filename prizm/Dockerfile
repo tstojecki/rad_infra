@@ -4,9 +4,19 @@ ENV DEBIAN_FRONTEND noninteractive
 
 COPY pdutil.sh /usr/local/
 
-# added libgif4, libopenjpeg2 for Prizm v12.4 install
-# added imagemagick for Prizm v11.2 install
-# removed && apt-get install -y xvfb \ not needed anymore
+# added for v11.2 (remove all of these for v12 or later):
+	# imagemagick
+	# xvfb
+	# x11-xkb-utils
+	# xfonts-base
+	# xfonts-scalable
+	# xfonts-unifont
+	# xserver-xorg-core
+	# xfonts-100dpi xfonts-75dpi xfonts-cyrillic
+	# libxi6
+# added for v12.4:
+	# libgif4 \ 
+	# libopenjpeg2 
 RUN apt-get update \
 	&& echo exit 0 > /usr/sbin/policy-rc.d \
 	&& apt-get install locales -y \
@@ -36,12 +46,16 @@ RUN apt-get update \
 	&& apt-get install -y xfonts-100dpi xfonts-75dpi xfonts-cyrillic \
 	&& apt-get install -y libxi6 \
 	&& /usr/local/pdutil.sh install --headless --version=11.2
+	# to gen an image for v12 or v13, remove the --headless switch & 
+	# update the --version or remove it to get latest
 
 ENV DEBIAN_FRONTEND teletype
 
-# ENTRYPOINT /usr/share/prizm/java/jre8/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc"  \
+# v12 and v13 entrypoint:
+# ENTRYPOINT /usr/share/prizm/java/jre8/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
 # 		&& /usr/share/prizm/scripts/pccis.sh start
+# v11 entrypoint:
 ENTRYPOINT Xvfb :20 &> /dev/null & export DISPLAY=:20 \
-		&& usr/share/prizm/java/jre6-linux-x86-64/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc"  \
+		&& usr/share/prizm/java/jre6-linux-x86-64/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
 		&& /usr/share/prizm/scripts/pccis.sh start \
 		&& tail -f /dev/null
