@@ -2,7 +2,7 @@ version: '3'
 services:
   elasticsearch:
     build:
-      context: .
+      context: ./es
     container_name: es
     environment:
       - cluster.name=es-cluster
@@ -34,7 +34,7 @@ services:
       - IPC_LOCK
     volumes:
       - esdata:/usr/share/elasticsearch/data
-      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 9200:9200
     networks:
@@ -55,7 +55,7 @@ services:
   redis: 
     image: redis:5.0.1-alpine
     container_name: redis
-
+    
     # running in privileged mode is for resolving the Redis warning: 
     # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel.
     privileged: true
@@ -67,7 +67,7 @@ services:
         aliases:
           - 'redis'
     volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
       - redisdata:/data
     # entrypoint: redis-server --appendonly yes
     # alternative to entrypoint and including additional configuration commands:
