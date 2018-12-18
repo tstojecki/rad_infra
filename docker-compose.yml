@@ -7,50 +7,23 @@ services:
     environment:
       - cluster.name=es-cluster
       - node.name=master
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx2g"
       # disabling xpack since we don't use it and it installed by default in this image
       # ES v6 contains -OSS alternatives that don't contain xpack
       - xpack.security.enabled=false
       - xpack.monitoring.enabled=false
 
-      - http.host=0.0.0.0
       - network.host=0.0.0.0
-      - http.port=9200
-      - transport.host=127.0.0.1
-      - http.compression=true
-      # - network.publish_host=172.20.5.193
-      # - transport.tcp.port=9300
-      # - transport.bind_host=_eth0_
-      # - discovery.zen.ping.unicast.hosts=172.20.5.193:9300
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    cap_add:
-      - IPC_LOCK
     volumes:
       - esdata:/usr/share/elasticsearch/data
       - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 9200:9200
-    networks:
-      esnet:
-        aliases:
-          - 'es'
 
   cerebro:
     image: lmenezes/cerebro:0.8.1
     container_name: cerebro
     ports:
       - 9000:9000
-    networks:
-      esnet:
-        aliases:
-          - 'cerebro'
 
   redis: 
     image: redis:5.0.1-alpine
@@ -62,10 +35,6 @@ services:
 
     ports:
       - 6379:6379
-    networks:
-      esnet:
-        aliases:
-          - 'redis'
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
       - redisdata:/data
@@ -87,10 +56,6 @@ services:
       - 18001:18001
       - 18681:18681    
       - 18682:18682
-    networks:
-      esnet:
-        aliases:
-          - 'prizm'
     volumes:
       - prizmlogs:/dev/logs
     tty: true
@@ -101,6 +66,3 @@ volumes:
   esdata:
   redisdata:
   prizmlogs:
-
-networks:
-   esnet:
