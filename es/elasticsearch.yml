@@ -1,3 +1,2 @@
 # xpack security is installed by default in ES-provided images from their docker registry
 # xpack.security.enabled: false
-
