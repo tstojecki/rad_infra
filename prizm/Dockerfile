@@ -18,6 +18,7 @@ COPY pdutil.sh /usr/local/
 	# libgif4 \ 
 	# libopenjpeg2 
 RUN apt-get update \
+	&& sed -i -e 's/\r$//' /usr/local/pdutil.sh \
 	&& echo exit 0 > /usr/sbin/policy-rc.d \
 	&& apt-get install locales -y \
 	&& locale-gen en_US.UTF-8 \
