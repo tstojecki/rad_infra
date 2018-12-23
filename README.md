@@ -1,19 +1,33 @@
 # ES, Redis, Cerebro, Prizm
 
+## Pre-Compose Step
+
+Create a file in the Prizm directory to contain your Accusoft Prizm license key. This license key is private and is therefore not part of the source control repository.
+
+- for version 11, name the file: license_v11.txt
+- for version 12, name the file: license_v12.txt
+- for version 13, name the file: license_v13.txt
+
+## Compose Containers
+
 1. Run `docker-compose up -d`
 
-2. ES from host: http://localhost:9200
+## Access the Hosts
 
-3. Cerebro from host: http://locahost:9000
+1. ES from host: http://localhost:9200
+
+2. Cerebro from host: http://locahost:9000
 
    Access ES in Cerebro: http://es:9200  
 
-4. Redis from host: redis-cli
+3. Redis from host: redis-cli
 
-5. Prizm from host: http://localhost:18681/PCCIS/V1/Static/Viewer/Test
+4. Prizm from host: http://localhost:18681/PCCIS/V1/Static/Viewer/Test
 
---- 
+---
+
 ### Windows troubleshooting tips
+
 If you get volume mapping errors, make sure COMPOSE_CONVERT_WINDOWS_PATHS is set in your environment variables
 
 ```SET COMPOSE_CONVERT_WINDOWS_PATHS=1```

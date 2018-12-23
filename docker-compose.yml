@@ -1,85 +1,88 @@
-version: '3'
+version: '3.1'
 services:
-  elasticsearch:
-    build:
-      context: ./es
-    container_name: es
-    environment:
-      - cluster.name=es-cluster
-      - node.name=master
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx2g"
-      # disabling xpack since we don't use it and it installed by default in this image
-      # ES v6 contains -OSS alternatives that don't contain xpack
-      - xpack.security.enabled=false
-      - xpack.monitoring.enabled=false
+  # elasticsearch:
+  #   build:
+  #     context: ./es
+  #   container_name: es
+  #   environment:
+  #     - cluster.name=es-cluster
+  #     - node.name=master
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms1g -Xmx2g"
+  #     # disabling xpack since we don't use it and it installed by default in this image
+  #     # ES v6 contains -OSS alternatives that don't contain xpack
+  #     - xpack.security.enabled=false
+  #     - xpack.monitoring.enabled=false
 
-      - http.host=0.0.0.0
-      - network.host=0.0.0.0
-      - http.port=9200
-      - transport.host=127.0.0.1
-      - http.compression=true
-      # - network.publish_host=172.20.5.193
-      # - transport.tcp.port=9300
-      # - transport.bind_host=_eth0_
-      # - discovery.zen.ping.unicast.hosts=172.20.5.193:9300
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    cap_add:
-      - IPC_LOCK
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-      - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    ports:
-      - 9200:9200
-    networks:
-      esnet:
-        aliases:
-          - 'es'
+  #     - http.host=0.0.0.0
+  #     - network.host=0.0.0.0
+  #     - http.port=9200
+  #     - transport.host=127.0.0.1
+  #     - http.compression=true
+  #     # - network.publish_host=172.20.5.193
+  #     # - transport.tcp.port=9300
+  #     # - transport.bind_host=_eth0_
+  #     # - discovery.zen.ping.unicast.hosts=172.20.5.193:9300
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #     nofile:
+  #       soft: 65536
+  #       hard: 65536
+  #   cap_add:
+  #     - IPC_LOCK
+  #   volumes:
+  #     - esdata:/usr/share/elasticsearch/data
+  #     - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+  #   ports:
+  #     - 9200:9200
+  #   networks:
+  #     esnet:
+  #       aliases:
+  #         - 'es'
 
-  cerebro:
-    image: lmenezes/cerebro:0.8.1
-    container_name: cerebro
-    ports:
-      - 9000:9000
-    networks:
-      esnet:
-        aliases:
-          - 'cerebro'
+  # cerebro:
+  #   image: lmenezes/cerebro:0.8.1
+  #   container_name: cerebro
+  #   ports:
+  #     - 9000:9000
+  #   networks:
+  #     esnet:
+  #       aliases:
+  #         - 'cerebro'
 
-  redis: 
-    image: redis:5.0.1-alpine
-    container_name: redis
+  # redis: 
+  #   image: redis:5.0.1-alpine
+  #   container_name: redis
     
-    # running in privileged mode is for resolving the Redis warning: 
-    # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel.
-    privileged: true
+  #   # running in privileged mode is for resolving the Redis warning: 
+  #   # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel.
+  #   privileged: true
 
-    ports:
-      - 6379:6379
-    networks:
-      esnet:
-        aliases:
-          - 'redis'
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-      - redisdata:/data
-    # entrypoint: redis-server --appendonly yes
-    # alternative to entrypoint and including additional configuration commands:
-    command: >
-      sh -c " echo never > /sys/kernel/mm/transparent_hugepage/enabled &&
-              sysctl -w net.core.somaxconn=1024 &&
-              redis-server --appendonly yes"
+  #   ports:
+  #     - 6379:6379
+  #   networks:
+  #     esnet:
+  #       aliases:
+  #         - 'redis'
+  #   volumes:
+  #     - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+  #     - redisdata:/data
+  #   # entrypoint: redis-server --appendonly yes
+  #   # alternative to entrypoint and including additional configuration commands:
+  #   command: >
+  #     sh -c " echo never > /sys/kernel/mm/transparent_hugepage/enabled &&
+  #             sysctl -w net.core.somaxconn=1024 &&
+  #             redis-server --appendonly yes"
 
   prizm:
     build:
       context: prizm/
-    image: prizm:11.2
+      # dockerfile: Dockerfile_v11
+      dockerfile: Dockerfile_v13
+    # image: prizm:11.2
+    image: prizm:13
     container_name: prizmdoc
     ports:
       - 3000:3000
@@ -91,11 +94,19 @@ services:
       esnet:
         aliases:
           - 'prizm'
-    volumes:
-      - prizmlogs:/dev/logs
+    # volumes:
+      # - prizmlogs:/dev/log
     tty: true
     stdin_open: true
+    secrets:
+      - prizm_license
     container_name: prizm
+    entrypoint: ["/usr/local/docker-entrypoint.sh"]
+
+secrets:
+  prizm_license: 
+    # file: ./prizm/license_v11.txt
+    file: ./prizm/license_v13.txt
 
 volumes:
   esdata:
