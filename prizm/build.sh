@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker image build . --tag "prizm:12.4" --no-cache
+docker image build . --tag "prizm:11.2" --no-cache
