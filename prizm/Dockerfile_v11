@@ -31,11 +31,4 @@ RUN apt-get update \
 
 ENV DEBIAN_FRONTEND teletype
 
-# v12 and v13 entrypoint:
-# ENTRYPOINT /usr/share/prizm/java/jre8/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
-# 		&& /usr/share/prizm/scripts/pccis.sh start
-# v11 entrypoint:
-ENTRYPOINT Xvfb :20 &> /dev/null & export DISPLAY=:20 \
-		&& usr/share/prizm/java/jre6-linux-x86-64/bin/java -jar /usr/share/prizm/plu/plu.jar deploy write "PrizmDoc" [license key]  \
-		&& /usr/share/prizm/scripts/pccis.sh start \
-		&& tail -f /dev/null
+COPY ./v11/docker-entrypoint.sh /usr/local
